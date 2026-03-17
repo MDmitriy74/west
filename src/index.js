@@ -116,10 +116,10 @@ class Gatling extends Creature {
 }
 
 class Lad extends Dog {
-    constructor() {
+    constructor(name, maxPower) {
         super();
-        this.name = 'Браток';
-        this.maxPower = 2;
+        this.name = name || 'Браток';
+        this.maxPower = maxPower || 2;
         this.currentPower = 2;
     }
 
@@ -215,6 +215,42 @@ class Rogue extends Creature {
     }
 }
 
+class PseudoDuck extends Dog {
+    constructor() {
+        super();
+        this.name = 'Псевдоутка';
+        this.maxPower = 3;
+    }
+
+    quacks() {
+        console.log('quack');
+    }
+
+    swims() {
+        console.log('float');
+    }
+}
+
+class Nemo extends Creature{
+    constructor() {
+        super('Немо', 4);
+    }
+
+    doBeforeAttack(gameContext, continuation) {
+        const { oppositePlayer, position, updateView } = gameContext;
+        const targetCard = oppositePlayer.table[position];
+
+        if (targetCard) {
+            const targetProto = Object.getPrototypeOf(targetCard);
+            Object.setPrototypeOf(this, targetProto);
+            updateView();
+            this.doBeforeAttack(gameContext, continuation);
+        } else {
+            continuation();
+        }
+    }
+}
+
 class Brewer extends Duck {
     constructor() {
         super();
@@ -238,15 +274,13 @@ class Brewer extends Duck {
 }
 
 const seriffStartDeck = [
-    new Duck(),
-    new Brewer(),
+    new Nemo(),
 ];
 const banditStartDeck = [
-    new Dog(),
-    new Dog(),
-    new Dog(),
-    new Dog(),
+    new Brewer(),
+    new Brewer(),
 ];
+
 
 const game = new Game(seriffStartDeck, banditStartDeck);
 
